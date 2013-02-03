@@ -13,6 +13,7 @@
 #include <QtDesigner/QDesignerExportWidget>
 #include "telemetryData.h"
 #include "mdiPlotOptions.h"
+#include "statisticsDisplay.h"
 #include <qt4gnuplot.h>
 
 class QDESIGNER_WIDGET_EXPORT mdiPlot : public qt4gnuplot
@@ -24,7 +25,9 @@ class QDESIGNER_WIDGET_EXPORT mdiPlot : public qt4gnuplot
     
   private:
     mdiPlotOptions *options;
+    statisticsDisplay *stats;
     QAction *showOptionsAction;
+    QAction *showStatsAction;
     void stdGraph();
     
   private slots:

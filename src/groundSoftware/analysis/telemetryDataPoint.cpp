@@ -64,6 +64,7 @@ void telemetryDataPoint::clear(){
   unitList.append("kts");
   unitList.append("Celcius");
   unitList.append("Volts");
+  unitList.append("Hz");
 }
 
 int telemetryDataPoint::fieldIndex(QString field){
@@ -82,31 +83,64 @@ int telemetryDataPoint::unitIndex(QString unit){
   return 0; // ignore data
 }
 
-void telemetryDataPoint::storeFieldData(int field, double value, int unitType=-1){
-  if (field==fieldIndex("Time"))              time=units(value,unitType,unitIndex("seconds"));
-  if (field==fieldIndex("Frequency"))         frequency=value;
-  if (field==fieldIndex("Acceleration (X)"))  accX=value;
-  if (field==fieldIndex("Acceleration (Y)"))  accY=value;
-  if (field==fieldIndex("Acceleration (Z)"))  accZ=value;
-  if (field==fieldIndex("Gyroscope (X)"))     gyrX=value;
-  if (field==fieldIndex("Gyroscope (Y)"))     gyrY=value;
-  if (field==fieldIndex("Gyroscope (Z)"))     gyrZ=value;
-  if (field==fieldIndex("Magnetometer (X)"))  magX=units(value,unitType,unitIndex("Tesla"));
-  if (field==fieldIndex("Magnetometer (Y)"))  magY=units(value,unitType,unitIndex("Tesla"));
-  if (field==fieldIndex("Magnetometer (Z)"))  magZ=units(value,unitType,unitIndex("Tesla"));
-  if (field==fieldIndex("Roll"))              roll=value;
-  if (field==fieldIndex("Pitch"))             pitch=value;
-  if (field==fieldIndex("Yaw"))               yaw=value;
-  if (field==fieldIndex("Latitude"))          latitude=value;
-  if (field==fieldIndex("Longitude"))         longitude=value;
-  if (field==fieldIndex("Altitude"))          altitude=value;
-  if (field==fieldIndex("Track"))             track=value;
-  if (field==fieldIndex("Speed"))             speed=units(value,unitType,unitIndex("m/s"));
-  if (field==fieldIndex("hDOP"))              hDOP=units(value,unitType,unitIndex("non-dim"));
-  if (field==fieldIndex("vDOP"))              vDOP=units(value,unitType,unitIndex("non-dim"));
-  if (field==fieldIndex("mDOP"))              mDOP=units(value,unitType,unitIndex("non-dim"));
-  if (field==fieldIndex("Temperature"))       temperature=value;
-  if (field==fieldIndex("Voltage"))           voltage=value;
+QString telemetryDataPoint::fieldUnitString(int field){
+  return unitList[fieldUnit(field)];
+}
+
+int telemetryDataPoint::fieldUnit(int field){
+  if (field==fieldIndex("Time"))              return unitIndex("seconds");
+  if (field==fieldIndex("Frequency"))         return unitIndex("Hz");
+  if (field==fieldIndex("Acceleration (X)"))  return unitIndex("m/s^2");
+  if (field==fieldIndex("Acceleration (Y)"))  return unitIndex("m/s^2");
+  if (field==fieldIndex("Acceleration (Z)"))  return unitIndex("m/s^2");
+  if (field==fieldIndex("Gyroscope (X)"))     return unitIndex("deg/sec");
+  if (field==fieldIndex("Gyroscope (Y)"))     return unitIndex("deg/sec");
+  if (field==fieldIndex("Gyroscope (Z)"))     return unitIndex("deg/sec");
+  if (field==fieldIndex("Magnetometer (X)"))  return unitIndex("Tesla");
+  if (field==fieldIndex("Magnetometer (Y)"))  return unitIndex("Tesla");
+  if (field==fieldIndex("Magnetometer (Z)"))  return unitIndex("Tesla");
+  if (field==fieldIndex("Roll"))              return unitIndex("deg");
+  if (field==fieldIndex("Pitch"))             return unitIndex("deg");
+  if (field==fieldIndex("Yaw"))               return unitIndex("deg");
+  if (field==fieldIndex("Latitude"))          return unitIndex("deg");
+  if (field==fieldIndex("Longitude"))         return unitIndex("deg");
+  if (field==fieldIndex("Altitude"))          return unitIndex("m");
+  if (field==fieldIndex("Track"))             return unitIndex("deg");
+  if (field==fieldIndex("Speed"))             return unitIndex("m/s");
+  if (field==fieldIndex("hDOP"))              return unitIndex("non-dim");
+  if (field==fieldIndex("vDOP"))              return unitIndex("non-dim");
+  if (field==fieldIndex("mDOP"))              return unitIndex("non-dim");
+  if (field==fieldIndex("Temperature"))       return unitIndex("Celcius");
+  if (field==fieldIndex("Voltage"))           return unitIndex("Volts");
+  return 0;
+}
+
+void telemetryDataPoint::storeFieldData(int field, double value, int unitType){
+  long double cuVal=units(value,unitType,fieldUnit(field));
+  if (field==fieldIndex("Time"))              time=cuVal;
+  if (field==fieldIndex("Frequency"))         frequency=cuVal;
+  if (field==fieldIndex("Acceleration (X)"))  accX=cuVal;
+  if (field==fieldIndex("Acceleration (Y)"))  accY=cuVal;
+  if (field==fieldIndex("Acceleration (Z)"))  accZ=cuVal;
+  if (field==fieldIndex("Gyroscope (X)"))     gyrX=cuVal;
+  if (field==fieldIndex("Gyroscope (Y)"))     gyrY=cuVal;
+  if (field==fieldIndex("Gyroscope (Z)"))     gyrZ=cuVal;
+  if (field==fieldIndex("Magnetometer (X)"))  magX=cuVal;
+  if (field==fieldIndex("Magnetometer (Y)"))  magY=cuVal;
+  if (field==fieldIndex("Magnetometer (Z)"))  magZ=cuVal;
+  if (field==fieldIndex("Roll"))              roll=cuVal;
+  if (field==fieldIndex("Pitch"))             pitch=cuVal;
+  if (field==fieldIndex("Yaw"))               yaw=cuVal;
+  if (field==fieldIndex("Latitude"))          latitude=cuVal;
+  if (field==fieldIndex("Longitude"))         longitude=cuVal;
+  if (field==fieldIndex("Altitude"))          altitude=cuVal;
+  if (field==fieldIndex("Track"))             track=cuVal;
+  if (field==fieldIndex("Speed"))             speed=cuVal;
+  if (field==fieldIndex("hDOP"))              hDOP=cuVal;
+  if (field==fieldIndex("vDOP"))              vDOP=cuVal;
+  if (field==fieldIndex("mDOP"))              mDOP=cuVal;
+  if (field==fieldIndex("Temperature"))       temperature=cuVal;
+  if (field==fieldIndex("Voltage"))           voltage=cuVal;
 }
 
 double telemetryDataPoint::fetchFieldData(int field){
@@ -136,7 +170,7 @@ double telemetryDataPoint::fetchFieldData(int field){
   if (field==fieldIndex("Voltage"))           return voltage;
 }
 
-double telemetryDataPoint::units(double value, int init, int fin){
+long double telemetryDataPoint::units(long double value, int init, int fin){
   if (init==unitIndex("kts")           && fin==unitIndex("m/s"))     return value/0.514;
   if (init==unitIndex("milli-seconds") && fin==unitIndex("seconds")) return value/1000.;
   if (init==unitIndex("m")             && fin==unitIndex("non-dim")) return value/3.; // take typical commercial GPS accuracy as 3m - good enough guess in 2012

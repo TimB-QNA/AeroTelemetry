@@ -19,13 +19,16 @@ mdiPlot::mdiPlot(QWidget *parent) : qt4gnuplot(parent)
   setContextMenuPolicy(Qt::ActionsContextMenu);
   
   options = new mdiPlotOptions();
-  options->setWindowTitle("Graph Options\n");
-  
   showOptionsAction = new QAction("Options",this);
   addAction(showOptionsAction);
 
+  stats = new statisticsDisplay(options);
+  showStatsAction = new QAction("Statistics",this);
+  addAction(showStatsAction);
+  
   connect(showOptionsAction, SIGNAL(activated()), options, SLOT(show()));
   connect(options,           SIGNAL(accepted()),  this,    SLOT(scriptGraph()));
+  connect(showStatsAction,   SIGNAL(activated()), stats,   SLOT(show()));
   scriptGraph();
 }
 
@@ -35,8 +38,12 @@ void mdiPlot::scriptGraph(){
   int i;
   char line [4096];
   
-  options->print();
-  if (options->xValIndex==0) stdGraph();
+//  options->print();
+  if (options->xValIndex==0){
+    stdGraph();
+    return;
+  }
+  
   script.clear();
   script.append("set grid");
   script.append("set xlabel \""+tdp.fieldList[options->xValIndex]+"\"");
@@ -84,10 +91,15 @@ void mdiPlot::scriptGraph(){
   if (options->lineTypeIndex==0) lineType="dots";
   if (options->lineTypeIndex==1) lineType="points";
   if (options->lineTypeIndex==2) lineType="lines";
-  script.append(QString("plot '-' with ")+lineType);
+  
+  if (options->zValIndex==0){
+    script.append(QString("plot '-' with ")+lineType);
+  }else{
+    script.append(QString("splot '-' with ")+lineType);
+  }
 //  printf("Data Points = %i\n",dataset.size());
   for (i=0;i<dataset.size();i++){
-    sprintf(line,"%lg %lg", dataset.datapoint[i].fetchFieldData(options->xValIndex), dataset.datapoint[i].fetchFieldData(options->yValIndex));
+    sprintf(line,"%lg %lg %lg", dataset.datapoint[i].fetchFieldData(options->xValIndex), dataset.datapoint[i].fetchFieldData(options->yValIndex), dataset.datapoint[i].fetchFieldData(options->zValIndex));
     script.append(line);
   }
   script.append("e");
@@ -120,6 +132,6 @@ void mdiPlot::stdGraph(){
   script.append("set pm3d depthorder");
   script.append("splot cos(u)+.5*cos(u)*cos(v),sin(u)+.5*sin(u)*cos(v),.5*sin(v) with pm3d, 1+cos(u)+.5*cos(u)*cos(v),.5*sin(v),sin(u)+.5*sin(u)*cos(v) with pm3d");
 
-  for (i=0;i<script.size();i++) printf("%s\n",script[i].toAscii().data());
+//  for (i=0;i<script.size();i++) printf("%s\n",script[i].toAscii().data());
   plotgraph();
 }

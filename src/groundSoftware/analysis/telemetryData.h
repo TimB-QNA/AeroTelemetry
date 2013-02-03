@@ -15,9 +15,15 @@ class telemetryData
     void readXML(QDomElement root);
     void writeXML(QString fileName);
     QStringList writeXML();
+    double   mean(double xMin, double xMax, bool wholeSignal, int xIndex, int yIndex);
+    double    rms(double xMin, double xMax, bool wholeSignal, int xIndex, int yIndex);
+    double rmsDev(double xMin, double xMax, bool wholeSignal, int xIndex, int yIndex);
+    double avgDev(double xMin, double xMax, bool wholeSignal, int xIndex, int yIndex);
   
 //  private:
     QList<telemetryDataPoint> datapoint;
+    telemetryDataPoint meanVals;
+    telemetryDataPoint rmsVals;
 };
 
 #endif

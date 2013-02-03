@@ -11,7 +11,8 @@ HEADERS += mainWindow.h \
            telemetryData.h \
            telemetryDataPoint.h \
            mdiPlot.h \
-           mdiPlotOptions.h
+           mdiPlotOptions.h \
+           statisticsDisplay.h
 
 SOURCES += main.cpp \
            mainWindow.cpp \
@@ -20,7 +21,8 @@ SOURCES += main.cpp \
            telemetryData.cpp \
            telemetryDataPoint.cpp \
            mdiPlot.cpp \
-           mdiPlotOptions.cpp
+           mdiPlotOptions.cpp \
+           statisticsDisplay.cpp
 
 LIBS += -lqt4gnuplot
 

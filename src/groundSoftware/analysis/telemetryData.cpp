@@ -85,3 +85,92 @@ QStringList telemetryData::writeXML(){
   output.append("</telemetry>");
   return output;
 }
+
+
+double telemetryData::mean(double xMin, double xMax, bool wholeSignal, int xIndex, int yIndex){
+  int i, xLow=0, xHigh=datapoint.size();
+  double sum, result, dx, yAvg;
+  
+  if (!wholeSignal){
+    for (i=0;i<datapoint.size();i++){
+      if (datapoint[i].fetchFieldData(xIndex)<xMin) xLow=i;
+      if (datapoint[i].fetchFieldData(xIndex)<xMax) xHigh=i;
+    }
+  }
+
+  sum=0.;
+  for (i=xLow+1;i<xHigh;i++){
+    dx=datapoint[i].fetchFieldData(xIndex)-datapoint[i-1].fetchFieldData(xIndex);
+    yAvg=(datapoint[i].fetchFieldData(yIndex)+datapoint[i-1].fetchFieldData(yIndex))/2.;
+    sum+=dx*yAvg;
+  }
+  dx=datapoint[xHigh].fetchFieldData(xIndex)-datapoint[xLow].fetchFieldData(xIndex);
+  result=sum/dx;
+  meanVals.storeFieldData(yIndex, result);
+  return result;
+}
+
+double telemetryData::rms(double xMin, double xMax, bool wholeSignal, int xIndex, int yIndex){
+  int i, xLow=0, xHigh=datapoint.size();
+  double sum, result, dx, yAvg;
+
+  if (!wholeSignal){
+    for (i=0;i<datapoint.size();i++){
+      if (datapoint[i].fetchFieldData(xIndex)<xMin) xLow=i;
+      if (datapoint[i].fetchFieldData(xIndex)<xMax) xHigh=i;
+    }
+  }
+
+  sum=0.;
+  for (i=xLow+1;i<xHigh;i++){
+    dx=datapoint[i].fetchFieldData(xIndex)-datapoint[i-1].fetchFieldData(xIndex);
+    yAvg=(datapoint[i].fetchFieldData(yIndex)+datapoint[i-1].fetchFieldData(yIndex))/2.;
+    sum+=dx*pow(yAvg,2.);
+  }
+  dx=datapoint[xHigh].fetchFieldData(xIndex)-datapoint[xLow].fetchFieldData(xIndex);
+  result=sqrt(sum/dx);
+  rmsVals.storeFieldData(yIndex, result);
+  return result;
+}
+
+double telemetryData::rmsDev(double xMin, double xMax, bool wholeSignal, int xIndex, int yIndex){
+  int i, xLow=0, xHigh=datapoint.size();
+  double sum, dx, yAvg;
+
+  if (!wholeSignal){
+    for (i=0;i<datapoint.size();i++){
+      if (datapoint[i].fetchFieldData(xIndex)<xMin) xLow=i;
+      if (datapoint[i].fetchFieldData(xIndex)<xMax) xHigh=i;
+    }
+  }
+
+  sum=0.;
+  for (i=xLow+1;i<xHigh;i++){
+    dx=datapoint[i].fetchFieldData(xIndex)-datapoint[i-1].fetchFieldData(xIndex);
+    yAvg=(datapoint[i].fetchFieldData(yIndex)+datapoint[i-1].fetchFieldData(yIndex))/2.-meanVals.fetchFieldData(yIndex);
+    sum+=dx*pow(yAvg,2.);
+  }
+  dx=datapoint[xHigh].fetchFieldData(xIndex)-datapoint[xLow].fetchFieldData(xIndex);
+  return sqrt(sum/dx);
+}
+
+double telemetryData::avgDev(double xMin, double xMax, bool wholeSignal, int xIndex, int yIndex){
+  int i, xLow=0, xHigh=datapoint.size();
+  double sum, result, dx, yAvg;
+
+  if (!wholeSignal){
+    for (i=0;i<datapoint.size();i++){
+      if (datapoint[i].fetchFieldData(xIndex)<xMin) xLow=i;
+      if (datapoint[i].fetchFieldData(xIndex)<xMax) xHigh=i;
+    }
+  }
+
+  sum=0.;
+  for (i=xLow+1;i<xHigh;i++){
+    dx=datapoint[i].fetchFieldData(xIndex)-datapoint[i-1].fetchFieldData(xIndex);
+    yAvg=(datapoint[i].fetchFieldData(yIndex)+datapoint[i-1].fetchFieldData(yIndex))/2.-meanVals.fetchFieldData(yIndex);
+    sum+=dx*fabs(yAvg);
+  }
+  dx=datapoint[xHigh].fetchFieldData(xIndex)-datapoint[xLow].fetchFieldData(xIndex);
+  return sum/dx;
+}

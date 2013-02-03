@@ -17,6 +17,8 @@ mdiPlotOptions::mdiPlotOptions(QDialog *parent) : QDialog(parent)
   QStringList lineTypeList;
   QGridLayout *gridLayout = new QGridLayout();
 
+  setWindowTitle("Graph Options\n");
+  
   lineTypeList.append("Dots");
   lineTypeList.append("Points");
   lineTypeList.append("Solid Line");
@@ -24,12 +26,12 @@ mdiPlotOptions::mdiPlotOptions(QDialog *parent) : QDialog(parent)
   xComboLabel = new QLabel(this); gridLayout->addWidget(xComboLabel,0,0);
   xComboLabel->setText("X Data Source");
   xValues = new QComboBox(this);  gridLayout->addWidget(xValues,0,1,1,-1);
-  xValues->addItems(tdp.fieldList); xValues->setCurrentIndex(1);
+  xValues->addItems(tdp.fieldList);
   
   yComboLabel = new QLabel(this); gridLayout->addWidget(yComboLabel,1,0);
   yComboLabel->setText("Y Data Source");
   yValues = new QComboBox(this);  gridLayout->addWidget(yValues,1,1,1,-1);
-  yValues->addItems(tdp.fieldList); yValues->setCurrentIndex(3);
+  yValues->addItems(tdp.fieldList);
 
   zComboLabel = new QLabel(this); gridLayout->addWidget(zComboLabel,2,0);
   zComboLabel->setText("Z Data Source");
@@ -64,6 +66,8 @@ mdiPlotOptions::mdiPlotOptions(QDialog *parent) : QDialog(parent)
   okButton = new QPushButton("Ok"); gridLayout->addWidget(okButton,10,1);
   cancelButton = new QPushButton("Cancel"); gridLayout->addWidget(cancelButton,10,2);
 
+  clear();
+
   setLayout(gridLayout);
 
   connect(xMinAuto, SIGNAL(toggled(bool)), xMinSpin, SLOT(setDisabled(bool)));
@@ -72,41 +76,43 @@ mdiPlotOptions::mdiPlotOptions(QDialog *parent) : QDialog(parent)
   connect(yMaxAuto, SIGNAL(toggled(bool)), yMaxSpin, SLOT(setDisabled(bool)));
   connect(zMinAuto, SIGNAL(toggled(bool)), zMinSpin, SLOT(setDisabled(bool)));
   connect(zMaxAuto, SIGNAL(toggled(bool)), zMaxSpin, SLOT(setDisabled(bool)));
-  
-
   connect(okButton,     SIGNAL(clicked()), this, SLOT(okClicked()));
   connect(cancelButton, SIGNAL(clicked()), this, SLOT(cancelClicked()));
-
-  clear();
-
 }
 
 void mdiPlotOptions::clear(){
-  xMinAuto->setChecked(true);
-  xMaxAuto->setChecked(true);
-  yMinAuto->setChecked(true);
-  yMaxAuto->setChecked(true);
-  zMinAuto->setChecked(true);
-  zMaxAuto->setChecked(true);
-
   xValIndex=0;
   yValIndex=0;
   zValIndex=0;
   lineTypeIndex=0;
-
-  xMinAutoRange=true;
-  xMaxAutoRange=true;
-  yMinAutoRange=true;
-  yMaxAutoRange=true;
-  zMinAutoRange=true;
-  zMaxAutoRange=true;
-
+  
   xRangeMin=0;
   xRangeMax=1;
   yRangeMin=0;
   yRangeMax=1;
   zRangeMin=0;
   zRangeMax=1;
+  
+  xMinAutoRange=true;
+  xMaxAutoRange=true;
+  yMinAutoRange=true;
+  yMaxAutoRange=true;
+  zMinAutoRange=true;
+  zMaxAutoRange=true;
+  
+  xMinAuto->setChecked(xMinAutoRange);
+  xMaxAuto->setChecked(xMaxAutoRange);
+  yMinAuto->setChecked(yMinAutoRange);
+  yMaxAuto->setChecked(yMaxAutoRange);
+  zMinAuto->setChecked(zMinAutoRange);
+  zMaxAuto->setChecked(zMaxAutoRange);
+  
+  xMinSpin->setDisabled(xMinAutoRange);
+  xMaxSpin->setDisabled(xMaxAutoRange);
+  yMinSpin->setDisabled(yMinAutoRange);
+  yMaxSpin->setDisabled(yMaxAutoRange);
+  zMinSpin->setDisabled(zMinAutoRange);
+  zMaxSpin->setDisabled(zMaxAutoRange);
 }
 
 void mdiPlotOptions::okClicked(){

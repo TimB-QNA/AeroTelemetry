@@ -40,15 +40,17 @@ class telemetryDataPoint
     QStringList fieldList;
     QStringList unitList;
     
-           telemetryDataPoint();
-    void   clear();
-    int    fieldIndex(QString field);
-    int    unitIndex(QString unit);
-    void   storeFieldData(int fieldIndex, double value, int unitType);
-    double fetchFieldData(int fieldIndex);
-    double units(double value, int init, int fin);
-    void   print();
-    bool   readXML(QDomElement root);
+                telemetryDataPoint();
+    void        clear();
+    int         fieldIndex(QString field);
+    int         unitIndex(QString unit);
+    void        storeFieldData(int fieldIndex, double value, int unitType=-1);
+    double      fetchFieldData(int fieldIndex);
+    QString     fieldUnitString(int field);
+    int         fieldUnit(int field);
+    long double units(long double value, int init, int fin);
+    void        print();
+    bool        readXML(QDomElement root);
     QStringList writeXML();
 };
 
