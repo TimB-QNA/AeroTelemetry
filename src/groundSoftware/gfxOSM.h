@@ -1,5 +1,9 @@
-#ifndef gfxObject_H
-  #define gfxObject_H
+#ifndef gfxOSM_H
+  #define gfxOSM_H
+
+#include "gfxObject.h"
+#include "gfxOSMnode.h"
+#include "gfxOSMway.h"
 
 #include <QtGui>
 #include <QVTKWidget.h>
@@ -16,23 +20,24 @@
 #include <vtkCamera.h>
 #include <vtkRenderer.h>
 #include <vtkRenderWindow.h>
+#include <vtkPolyLine.h>
+
 #include <vector>
 #include "openNURBS-5/opennurbs.h"
 using namespace std;
 
-class gfxObject
+class gfxOSM : public gfxObject
 {
   public:
-    vector<vtkActor*> actor;
-    gfxObject(vtkRenderer *ren);
-    virtual bool loadCAD(QString filename);
-    void setPosition(double x, double y, double z);
-    void setRotation(double x, double y, double z);
-    void addUserSphere(double x, double y, double z, double r, float red=1, float green=0, float blue=0);
+    gfxOSM(vtkRenderer *ren);
+    bool loadCAD(QString filename);
+
+  private:
+    vtkActor* createActor(int obj);
+    void simplifyrefs();
     
-  protected:
-    vtkRenderer *renderer;    
-    vtkSmartPointer<vtkPoints> points;
+    QList<gfxOSMnode> node;
+    QList<gfxOSMway> way;
 };
 
 #endif

@@ -6,6 +6,8 @@
 #include "modelData.h"
 #include "settings.h"
 #include "pluginInterfaces.h"
+#include "navigationToolbar.h"
+#include "graphPlot.h"
 
 class mainWindow : public QMainWindow
 {
@@ -13,6 +15,9 @@ class mainWindow : public QMainWindow
 
   public:
     mainWindow(QMainWindow *parent=0);
+
+  public slots:
+    void loadSession(QString fileName="");
     
   private:
     gfxDisplay *vtkWidget;
@@ -25,6 +30,14 @@ class mainWindow : public QMainWindow
     QAction *saveSessionAction;
     QAction *exitAction;
 
+    // Import sub-menu
+    QMenu *importMenu;
+    QAction *importDataAction;
+
+    // View menu entries
+    QMenu *viewMenu;
+    QAction *addDockedGraphAction;
+  
     // Tool Menu Entries
     QMenu *toolMenu;
     QAction *settingsAction;
@@ -36,14 +49,24 @@ class mainWindow : public QMainWindow
     QComboBox *viewCombo;
     QAction *viewStoreAction;
 
+    navigationToolbar *navToolbar;
+    
     QStatusBar *statBar;
+    QLabel *statusLabel;
+
+    QList<QDockWidget*> dockWidget;
+    QList<graphPlot*> graph;
+
+    void addDockedWidget(QDomNode root);
     
   private slots:
-    void loadSession();
     void saveSession();
+    void importDataFromCSV();
     void addGfxObjectToModel(QString body, QString type, double x, double y, double z, double size);
     void updateModelPosition(QString body, double x, double y, double z);
     void updateModelRotation(QString body, double x, double y, double z);
+    void updateModelGuiData(int index);
+    void addDockedGraph();
 };
 
 #endif

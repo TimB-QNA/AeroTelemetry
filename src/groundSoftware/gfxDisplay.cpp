@@ -2,12 +2,15 @@
 #include <math.h>
 
 #include "gfxDisplay.h"
-#include "gfxObject.h"
+
+#include "gfxRhino3D.h"
+#include "gfxOSM.h"
 
 gfxDisplay::gfxDisplay(QVTKWidget *parent) : QVTKWidget(parent){
   int i;
   setAutoFillBackground(false);
-
+  setBaseSize(640,480);
+  
   // Setup renderer
   renderer = vtkRenderer::New();
   renderer->SetBackground(0.0,0.0,0.0);
@@ -22,7 +25,6 @@ gfxDisplay::gfxDisplay(QVTKWidget *parent) : QVTKWidget(parent){
   defaultCamera->SetViewUp(0,0,1);
   renderer->SetActiveCamera(defaultCamera);
 
-  Scenery = new gfxObject(renderer);
   runRenderer();
 }
 
@@ -33,12 +35,33 @@ void gfxDisplay::runRenderer(){
 }
 
 void gfxDisplay::loadScenery(QString filename){
-  Scenery->loadCAD(filename);
+  gfxRhino3D *tempR3D; tempR3D = new gfxRhino3D(renderer);
+  gfxOSM     *tempOSM; tempOSM = new gfxOSM(renderer);
+  
+  if (tempR3D->loadCAD(filename)){
+    Scenery = tempR3D;
+    return;
+  }else{
+    delete tempR3D;
+  }
+
+  if (tempOSM->loadCAD(filename)){
+    Scenery = tempOSM;
+    return;
+  }else{
+    delete tempOSM;
+  }
 }
 
 int gfxDisplay::loadModel(QString filename){
-  model.append(new gfxObject(renderer));
-  model.back()->loadCAD(filename);
+  gfxRhino3D *tempR3D; tempR3D = new gfxRhino3D(renderer);
+
+  if (tempR3D->loadCAD(filename)){
+    model.append(tempR3D);
+  }else{
+    delete tempR3D;
+  }
+
   return model.size()-1;
 }
 

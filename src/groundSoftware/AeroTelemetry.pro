@@ -5,30 +5,52 @@ CONFIG  += qt warn_on release
 QMAKE_CXXFLAGS += -Wno-deprecated
 QT += xml network
 
-DEFINES += TOLERANCE=1e-9 VERSION=QString\\\(\\\"1.0-0\\\"\\\)
+DEFINES += TOLERANCE=1e-9 VERSION=QString\\\(\\\"pre-1.0-0\\\"\\\)
 
 HEADERS += mainWindow.h \
            gfxDisplay.h \
            gfxObject.h \
+           gfxRhino3D.h \
+           gfxOSM.h gfxOSMnode.h gfxOSMway.h\
            modelData.h \
            settings.h \
            viewSettings.h \
            odPoint.h \
            odMatrix.h \
-           pluginInterfaces.h
+           pluginInterfaces.h \
+           telemetryData.h \
+           telemetryDataPoint.h \
+           importDialog.h \
+           selectModelDialog.h \
+           navigationToolbar.h \
+           projection.h \
+           graphPlot.h \
+           graphPlotOptions.h
 
 SOURCES += main.cpp \
            mainWindow.cpp \
            gfxDisplay.cpp \
            gfxObject.cpp \
+           gfxRhino3D.cpp \
+           gfxOSM.cpp gfxOSMnode.cpp gfxOSMway.cpp\
            modelData.cpp \
            settings.cpp \
            viewSettings.cpp \
            odPoint.cpp \
-           odMatrix.cpp
+           odMatrix.cpp \
+           telemetryData.cpp \
+           telemetryDataPoint.cpp \
+           importDialog.cpp \
+           selectModelDialog.cpp \
+           navigationToolbar.cpp \
+           projection.cpp \
+           graphPlot.cpp \
+           graphPlotOptions.cpp
 
-INCLUDEPATH += /usr/include/vtk-5.8
+INCLUDEPATH += /usr/include/vtk-5.8 \
+               $$[QT_INSTALL_HEADERS]/OpenPilot
 
+LIBS += -lqt4gnuplot
 # VTK
 LIBS += -L/usr/lib/vtk-5.8 -lQVTK -lvtkCommon -lvtksys -lvtkRendering
 LIBS += -lvtkGraphics -lvtkFiltering
@@ -39,7 +61,7 @@ LIBS += openNURBS-5/libopenNURBS.a
 
 ARCH  = $$system("uname -m")
 OPSYS = $$system("uname")
-DESTDIR = ../bin-$$ARCH/
+DESTDIR = ../../bin-$$ARCH/
 
 UI_DIR = .$$OPSYS-$$ARCH/ui
 MOC_DIR = .$$OPSYS-$$ARCH/moc

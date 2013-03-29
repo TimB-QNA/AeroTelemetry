@@ -6,6 +6,8 @@
 #include <math.h>
 
 #include "pluginInterfaces.h"
+#include "importDialog.h"
+#include "selectModelDialog.h"
 #include "mainWindow.h"
 #include "gfxDisplay.h"
 
@@ -24,11 +26,19 @@ mainWindow::mainWindow(QMainWindow *parent){
   fileMenu = menuBar()->addMenu("File");
   loadSessionAction=fileMenu->addAction("&Load Session");
   saveSessionAction=fileMenu->addAction("&Save Session");
+  importMenu = fileMenu->addMenu("Import Data");
+  importDataAction = importMenu->addAction("From delimited data file");
   exitAction=fileMenu->addAction("E&xit");
+  
   connect(loadSessionAction, SIGNAL(activated()), this, SLOT(loadSession()));
   connect(saveSessionAction, SIGNAL(activated()), this, SLOT(saveSession()));
+  connect(importDataAction,  SIGNAL(activated()), this, SLOT(importDataFromCSV()));
   connect(exitAction,        SIGNAL(activated()), this, SLOT(close()));
 
+  viewMenu = menuBar()->addMenu("View");
+  addDockedGraphAction=viewMenu->addAction("Add docked graph");
+  connect(addDockedGraphAction, SIGNAL(activated()), this, SLOT(addDockedGraph()));
+  
   toolMenu = menuBar()->addMenu("Tools");
   connectAllNetAction   =toolMenu->addAction("Connect All Networks");
   disconnectAllNetAction=toolMenu->addAction("Disconnect All Networks");
@@ -44,26 +54,32 @@ mainWindow::mainWindow(QMainWindow *parent){
   
   // Setup view toolbar
   viewToolbar = addToolBar("View");
+  viewToolbar->setObjectName("viewToolbar");
   viewCombo   = new QComboBox();
   viewToolbar->addWidget(viewCombo);
   viewStoreAction=viewToolbar->addAction("Store View");
   connect(viewCombo, SIGNAL(currentIndexChanged(QString)), sessionSettings, SLOT(setView(QString)));
   connect(viewStoreAction, SIGNAL(activated()), sessionSettings, SLOT(storeView()));
 
+  navToolbar = new navigationToolbar(addToolBar("Navigation"));
+  connect(navToolbar, SIGNAL(timeIndexChanged(int)), this, SLOT(updateModelGuiData(int)));
   statBar=statusBar();
+//  statusLabel = new QLabel("");
   for (i=0;i<network.count();i++){
+//    statBar->addWidget(statusLabel);
     statBar->addWidget(network[i]->statusIndicator());
+    
   }
 }
 
-void mainWindow::loadSession(){
+void mainWindow::loadSession(QString fileName){
   int erl, erc, i, nNodes;
   QDomNode node, node2;
   QDomElement root, element, element2;
-  QString errMsg, fileName;
+  QString errMsg;
   QFile file;
 
-  fileName = QFileDialog::getOpenFileName(this, tr("Load Session"), ".", tr("Session Files (*.mdx)"));
+  if (fileName.isEmpty()) fileName = QFileDialog::getOpenFileName(this, tr("Load Session"), ".", tr("Session Files (*.mdx)"));
   if (fileName.isEmpty()) return;
 
   file.setFileName(fileName);
@@ -103,6 +119,19 @@ void mainWindow::loadSession(){
         testModel.back()->readXML(node);
       }
     }
+    if (element.tagName().toLower()=="mainwindow"){
+      node2=node.firstChild();
+      while (!node2.isNull()){
+        element2=node2.toElement();
+        if (element2.tagName().toLower()=="dockwidget") addDockedWidget(node2);
+        if (element2.tagName().toLower()=="state"){
+          if (element2.attribute("encoding").toLower()=="base64"){
+            restoreState(QByteArray::fromBase64(element2.text().toAscii()));
+          }
+        }
+        node2=node2.nextSibling();
+      }
+    }
     node=node.nextSibling();
     nNodes++;
   }
@@ -111,6 +140,31 @@ void mainWindow::loadSession(){
   viewCombo->clear();
   viewCombo->addItems(sessionSettings->viewsAvailable());
   vtkWidget->runRenderer();
+}
+
+void mainWindow::importDataFromCSV(){
+  int mIdx=-1;
+  if (testModel.size()==0){
+    statBar->showMessage(QString("No model to import data into"),5000);
+    return;
+  }
+//  if (testModel.size()==1) mIdx=0;
+//  if (testModel.size()>1){
+    selectModelDialog *sMDia = new selectModelDialog();
+    sMDia->models=testModel;
+    sMDia->exec();
+    mIdx=sMDia->mIndex;
+//  }
+  if (mIdx!=-1){
+    importDialog *iDia = new importDialog();
+    iDia->fileName = QFileDialog::getOpenFileName(this, tr("Import dataset"), ".", tr("Data Files (*.csv)"));
+    iDia->dataset=&testModel[0]->sampleData;
+    iDia->exec();
+  }
+  if (testModel[0]->sampleData.size()==0){
+    statBar->showMessage(QString("Dataset was not loaded"),5000);
+    return;
+  }
 }
 
 void mainWindow::saveSession(){
@@ -137,6 +191,23 @@ void mainWindow::saveSession(){
     tempData=testModel[j]->writeXML();
     for (i=0;i<tempData.count();i++) out << "  " << tempData[i] << "\n";
   }
+  
+  out << "  <mainWindow>\n";
+  for (j=0;j<dockWidget.count();j++){
+    out << "    <dockWidget>\n";
+    out << "      <objectName>" << dockWidget[j]->objectName() << "</objectName>\n";
+    // Find widget related to dock Window...
+    for (i=0;i<graph.count();i++){
+      if (graph[i]==dockWidget[j]->widget()){
+        tempData=graph[i]->writeXML();
+        break;
+      }
+    }
+    for (i=0;i<tempData.count();i++) out << "        " << tempData[i] << "\n";
+    out << "    </dockWidget>\n";
+  }
+  out << "    <state encoding='base64'>" << saveState().toBase64() << "</state>\n";
+  out << "  </mainWindow>\n";
   out << "</modelDisplay>\n";
   
   file.close();
@@ -171,4 +242,37 @@ void mainWindow::updateModelRotation(QString body, double x, double y, double z)
     if (testModel[i]->name.toLower()==body.toLower()) testModel[i]->updateRotation(x,y,z);
   }
   vtkWidget->runRenderer();
+}
+
+void mainWindow::updateModelGuiData(int index){
+  int i;
+  for (i=0;i<testModel.count();i++){
+    testModel[i]->updateGraphics(index);
+  }
+}
+
+void mainWindow::addDockedGraph(){
+  QDomDocument spec;
+  spec.setContent(QString("<dockWidget><graph></graph></dockWidget>"));
+  addDockedWidget(spec.documentElement());
+}
+
+void mainWindow::addDockedWidget(QDomNode root){
+  dockWidget.append(new QDockWidget());
+  dockWidget.back()->setObjectName(QString("dock%1").arg(dockWidget.size()-1));
+
+  QDomNode node;
+  QDomElement element;
+  node = root.firstChild();
+  while (!node.isNull()){
+    element=node.toElement();
+    if (element.tagName().toLower()=="objectname") dockWidget.back()->setObjectName(element.text());
+    if (element.tagName().toLower()=="graph"){
+      graph.append(new graphPlot(&testModel));
+      graph.back()->readXML(node);
+      dockWidget.back()->setWidget(graph.back());
+    }
+    node=node.nextSibling();
+  }
+  addDockWidget(Qt::LeftDockWidgetArea, dockWidget.back());
 }

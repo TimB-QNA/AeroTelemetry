@@ -76,6 +76,14 @@ void settings::storeView(){
   printf("  X = %lf\n", view[currentView].camX);
   printf("  Y = %lf\n", view[currentView].camY);
   printf("  Z = %lf\n", view[currentView].camZ);
+  printf("Camera Focus\n");
+  printf("  X = %lf\n", view[currentView].focX);
+  printf("  Y = %lf\n", view[currentView].focY);
+  printf("  Z = %lf\n", view[currentView].focZ);
+  printf("Camera Up\n");
+  printf("  X = %lf\n", view[currentView].upX);
+  printf("  Y = %lf\n", view[currentView].upY);
+  printf("  Z = %lf\n", view[currentView].upZ);
 }
 
 void settings::setView(QString vName){

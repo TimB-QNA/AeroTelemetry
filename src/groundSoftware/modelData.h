@@ -2,6 +2,7 @@
   #define modelData_H
 
 #include "gfxDisplay.h"
+#include "telemetryData.h"
 #include "odPoint.h"
 #include <QtXml>
 
@@ -14,13 +15,15 @@ class modelData
     QStringList writeXML();
 
     QString name;
-    odPoint position;
+//    odPoint position;
     odPoint velocity;
     odPoint attitude;
-
+    telemetryData sampleData;
+    
     void addUserSphere(double x, double y, double z, double r);
     void updatePosition(double x, double y, double z);
     void updateRotation(double x, double y, double z);
+    void updateGraphics(int index);
     
   private:
     int gfxModelId;

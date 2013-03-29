@@ -12,6 +12,7 @@ class viewSettings
     QStringList writeXML();
 
     QString viewName;
+    QString refFrame;
     double camX, camY, camZ;
     double focX, focY, focZ;
     double upX,  upY,  upZ;

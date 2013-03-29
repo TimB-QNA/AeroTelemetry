@@ -1,6 +1,7 @@
-#ifndef gfxObject_H
-  #define gfxObject_H
+#ifndef gfxRhino3D_H
+  #define gfxRhino3D_H
 
+#include "gfxObject.h"
 #include <QtGui>
 #include <QVTKWidget.h>
 #include <vtkSmartPointer.h>
@@ -20,19 +21,20 @@
 #include "openNURBS-5/opennurbs.h"
 using namespace std;
 
-class gfxObject
+class gfxRhino3D : public gfxObject
 {
   public:
-    vector<vtkActor*> actor;
-    gfxObject(vtkRenderer *ren);
-    virtual bool loadCAD(QString filename);
-    void setPosition(double x, double y, double z);
-    void setRotation(double x, double y, double z);
-    void addUserSphere(double x, double y, double z, double r, float red=1, float green=0, float blue=0);
+    gfxRhino3D(vtkRenderer *ren);
+    bool loadCAD(QString filename);
+
+  private:
+    vtkActor* createActor(const ON_Object *object, double red, double green, double blue);
     
-  protected:
-    vtkRenderer *renderer;    
-    vtkSmartPointer<vtkPoints> points;
+    int findONLayer(QString LayerName);
+    QString convertONstring(ON_wString ONs);
+
+    ONX_Model model;
+    int load3dm(QString inputFile);
 };
 
 #endif

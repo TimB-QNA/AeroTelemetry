@@ -3,11 +3,12 @@
 
 #include <QApplication>
 #include "mainWindow.h"
-
+#include "projection.h"
 void header();
 
 // Network feed plugins...
 QList<networkInterface*> network;
+projection planet;
 
 int main(int argc, char * argv[]){
   int i;
@@ -34,12 +35,19 @@ int main(int argc, char * argv[]){
   }
   
   mainWindow *window = new mainWindow;
+
+  for (i=0;i<argc;i++){
+    if (QString(argv[i])=="-i") window->loadSession(argv[i+1]);
+  }
+  
   window->show();
+  
   return app.exec();
 }
 
 void header(){
-  printf("Model Display Tool\n");
-  printf("This will become the main AeroTelemetry interface\n");
-  printf("Version: %s\n", VERSION.toAscii().data());
+  printf("AeroTelemetry Ground Program\n");
+  printf("\n");
+  printf("  Version: %s\n", VERSION.toAscii().data());
+  printf("   Author: Tim Brocklehurst - timb@engineering.selfip.org\n");
 }

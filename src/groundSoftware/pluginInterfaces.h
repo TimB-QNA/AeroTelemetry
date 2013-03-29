@@ -24,6 +24,6 @@ class networkInterface
     virtual void disconnectFromPeer()=0;
 };
 
-Q_DECLARE_INTERFACE(networkInterface, "ModelDisplay.networkInterface/1.0")
+Q_DECLARE_INTERFACE(networkInterface, "AeroTelemetry.networkInterface/1.0")
 
 #endif
