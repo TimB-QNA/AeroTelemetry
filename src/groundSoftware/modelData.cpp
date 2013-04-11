@@ -13,24 +13,27 @@ void modelData::createGfxObject(QString filename){
 }
 
 void modelData::readXML(QDomNode root){
+  int i;
+  QString geometryFile;
+  
   QDomNode node;
   QDomElement element;
   node = root.firstChild();
   while (!node.isNull()){
     element=node.toElement();
-    if (element.tagName().toLower()=="name") name=element.text();
-    if (element.tagName().toLower()=="geometry") geometryFile=element.text();
+    settings.readXML(node);
     node=node.nextSibling();
   }
 
+  geometryFile = settings.get("basicSettings.geometryFile").toString();
   if (!geometryFile.isNull()) createGfxObject(geometryFile);
 }
 
 QStringList modelData::writeXML(){
+  int i;
   QStringList xml;
   xml.append("<model>");
-  xml.append("  <name>"+name+"</name>");
-  xml.append("  <geometry>"+geometryFile+"</geometry>");
+  settings.writeXML();
   xml.append("</model>");
   return xml;
 }

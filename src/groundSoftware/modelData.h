@@ -3,6 +3,7 @@
 
 #include "gfxDisplay.h"
 #include "telemetryData.h"
+#include "modelDataSettingsManager.h"
 #include "odPoint.h"
 #include <QtXml>
 
@@ -14,7 +15,8 @@ class modelData
     void readXML(QDomNode root);
     QStringList writeXML();
 
-    QString name;
+    modelDataSettingsManager settings;
+    
 //    odPoint position;
     odPoint velocity;
     odPoint attitude;
@@ -28,7 +30,6 @@ class modelData
   private:
     int gfxModelId;
     gfxDisplay *display;
-    QString geometryFile;
 };
 
 #endif
