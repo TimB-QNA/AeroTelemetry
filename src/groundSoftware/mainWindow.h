@@ -5,9 +5,9 @@
 #include "gfxDisplay.h"
 #include "modelData.h"
 #include "settings.h"
-#include "pluginInterfaces.h"
 #include "navigationToolbar.h"
 #include "graphPlot.h"
+#include "editModelsDialog.h"
 
 class mainWindow : public QMainWindow
 {
@@ -40,9 +40,13 @@ class mainWindow : public QMainWindow
   
     // Tool Menu Entries
     QMenu *toolMenu;
+    QAction *editModelsAction;
     QAction *settingsAction;
     QAction *connectAllNetAction;
     QAction *disconnectAllNetAction;
+
+    // Tool menu dialogs
+    editModelsDialog *editModels;
     
     // View tool bar
     QToolBar *viewToolbar;
@@ -50,7 +54,7 @@ class mainWindow : public QMainWindow
     QAction *viewStoreAction;
 
     navigationToolbar *navToolbar;
-    
+   
     QStatusBar *statBar;
     QLabel *statusLabel;
 

@@ -21,7 +21,7 @@ mainWindow::mainWindow(QMainWindow *parent){
   setCentralWidget(vtkWidget);
 
   sessionSettings = new settings(vtkWidget);
-  
+      
   // Setup menus
   fileMenu = menuBar()->addMenu("File");
   loadSessionAction=fileMenu->addAction("&Load Session");
@@ -38,12 +38,17 @@ mainWindow::mainWindow(QMainWindow *parent){
   viewMenu = menuBar()->addMenu("View");
   addDockedGraphAction=viewMenu->addAction("Add docked graph");
   connect(addDockedGraphAction, SIGNAL(activated()), this, SLOT(addDockedGraph()));
-  
+
+  // Tools menu and dialogs...
   toolMenu = menuBar()->addMenu("Tools");
+  editModelsAction      =toolMenu->addAction("Edit Models");
   connectAllNetAction   =toolMenu->addAction("Connect All Networks");
   disconnectAllNetAction=toolMenu->addAction("Disconnect All Networks");
   settingsAction=toolMenu->addAction("&Settings");
-  connect(settingsAction, SIGNAL(activated()), sessionSettings, SLOT(show())); 
+
+  editModels = new editModelsDialog(&testModel, vtkWidget);
+  connect(editModelsAction, SIGNAL(activated()), editModels,      SLOT(show()));
+  connect(settingsAction,   SIGNAL(activated()), sessionSettings, SLOT(show()));
   for (i=0;i<network.count();i++){
     connect(connectAllNetAction,    SIGNAL(activated()), network[i]->asQObject(), SLOT(connectToPeer()));
     connect(disconnectAllNetAction, SIGNAL(activated()), network[i]->asQObject(), SLOT(disconnectFromPeer()));
@@ -139,7 +144,6 @@ void mainWindow::loadSession(QString fileName){
   // Setup GUI for session
   viewCombo->clear();
   viewCombo->addItems(sessionSettings->viewsAvailable());
-  vtkWidget->runRenderer();
 }
 
 void mainWindow::importDataFromCSV(){
@@ -219,7 +223,7 @@ void mainWindow::addGfxObjectToModel(QString body, QString type, double x, doubl
 //    printf("Looking for body to add ball to\n");
     for (i=0;i<testModel.count();i++){
 //      printf("  Looking for .%s.    -    Found .%s.\n",testModel[i]->name.toLower().toAscii().data(), body.toLower().toAscii().data());
-      if (testModel[i]->name.toLower()==body.toLower()){
+      if (testModel[i]->settings.get("basicSettings.modelName").toString().toLower()==body.toLower()){
 //        printf("    Found body - adding ball\n");
 //        printf("    Radius=%lf\n",size/2.);
         testModel[i]->addUserSphere(x, y, z, size/2.);
@@ -231,17 +235,15 @@ void mainWindow::addGfxObjectToModel(QString body, QString type, double x, doubl
 void mainWindow::updateModelPosition(QString body, double x, double y, double z){
   int i;
   for (i=0;i<testModel.count();i++){
-    if (testModel[i]->name.toLower()==body.toLower()) testModel[i]->updatePosition(x,y,z);
+    if (testModel[i]->settings.get("basicSettings.modelName").toString().toLower()==body.toLower()) testModel[i]->updatePosition(x,y,z);
   }
-  vtkWidget->runRenderer();
 }
 
 void mainWindow::updateModelRotation(QString body, double x, double y, double z){
   int i;
   for (i=0;i<testModel.count();i++){
-    if (testModel[i]->name.toLower()==body.toLower()) testModel[i]->updateRotation(x,y,z);
+    if (testModel[i]->settings.get("basicSettings.modelName").toString().toLower()==body.toLower()) testModel[i]->updateRotation(x,y,z);
   }
-  vtkWidget->runRenderer();
 }
 
 void mainWindow::updateModelGuiData(int index){

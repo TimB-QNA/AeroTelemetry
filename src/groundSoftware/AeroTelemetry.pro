@@ -10,7 +10,6 @@ DEFINES += TOLERANCE=1e-9 VERSION=QString\\\(\\\"pre-1.0-0\\\"\\\)
 HEADERS += mainWindow.h \
            gfxDisplay.h \
            gfxObject.h \
-           gfxRhino3D.h \
            gfxOSM.h gfxOSMnode.h gfxOSMway.h\
            modelData.h \
            settings.h \
@@ -25,13 +24,15 @@ HEADERS += mainWindow.h \
            navigationToolbar.h \
            projection.h \
            graphPlot.h \
-           graphPlotOptions.h
+           graphPlotOptions.h \
+           editModelsDialog.h \
+           modelDataSettingsDialog.h \
+           modelDataSettingsManager.h
 
 SOURCES += main.cpp \
            mainWindow.cpp \
            gfxDisplay.cpp \
            gfxObject.cpp \
-           gfxRhino3D.cpp \
            gfxOSM.cpp gfxOSMnode.cpp gfxOSMway.cpp\
            modelData.cpp \
            settings.cpp \
@@ -45,7 +46,10 @@ SOURCES += main.cpp \
            navigationToolbar.cpp \
            projection.cpp \
            graphPlot.cpp \
-           graphPlotOptions.cpp
+           graphPlotOptions.cpp \
+           editModelsDialog.cpp \
+           modelDataSettingsDialog.cpp \
+           modelDataSettingsManager.cpp
 
 INCLUDEPATH += /usr/include/vtk-5.8 \
                $$[QT_INSTALL_HEADERS]/OpenPilot
@@ -57,8 +61,9 @@ LIBS += -lvtkGraphics -lvtkFiltering
 
 
 #Open NURBS
-LIBS += openNURBS-5/libopenNURBS.a
-
+#LIBS += openNURBS-5/libopenNURBS.a
+#LIBS += openNURBS-5/libopenNurbs-5.so
+LIBS += -lopenNurbs-5
 ARCH  = $$system("uname -m")
 OPSYS = $$system("uname")
 DESTDIR = ../../bin-$$ARCH/

@@ -145,6 +145,7 @@ vtkActor* gfxOSM::createActor(int obj){
   //Create Actor
   vtkActor *tmpActor = vtkActor::New();
   tmpActor->SetMapper(mapper);
+  tmpActor->GetProperty()->SetInterpolationToGouraud();
   if (way[obj].type.toLower()=="highway" && way[obj].level.toLower()=="motorway")  tmpActor->GetProperty()->SetColor(0, 0, 1);
   if (way[obj].type.toLower()=="highway" && way[obj].level.toLower()=="primary")   tmpActor->GetProperty()->SetColor(1, 0, 0);
   if (way[obj].type.toLower()=="highway" && way[obj].level.toLower()=="secondary") tmpActor->GetProperty()->SetColor(1, 0.5, 0);

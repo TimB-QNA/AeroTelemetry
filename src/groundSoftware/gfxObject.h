@@ -17,22 +17,21 @@
 #include <vtkRenderer.h>
 #include <vtkRenderWindow.h>
 #include <vector>
-#include "openNURBS-5/opennurbs.h"
+#include "pluginInterfaces.h"
 using namespace std;
 
 class gfxObject
 {
   public:
     vector<vtkActor*> actor;
+    vtkRenderer *renderer;
+    vtkSmartPointer<vtkPoints> points;
+    
     gfxObject(vtkRenderer *ren);
-    virtual bool loadCAD(QString filename);
+    bool loadCAD(QString filename);
     void setPosition(double x, double y, double z);
     void setRotation(double x, double y, double z);
     void addUserSphere(double x, double y, double z, double r, float red=1, float green=0, float blue=0);
-    
-  protected:
-    vtkRenderer *renderer;    
-    vtkSmartPointer<vtkPoints> points;
 };
 
 #endif

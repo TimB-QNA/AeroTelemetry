@@ -96,8 +96,8 @@ void graphPlotOptions::showEvent(QShowEvent *event){
   // Populate combo box with current model names...
   printf("Populating model name combo-box with %i names\n", testModel->count());
   for (i=0;i<testModel->count();i++){
-    printf("ID %i - %s\n", i, testModel->at(i)->name.toAscii().data());
-    modelCombo->addItem(testModel->at(i)->name);
+//    printf("ID %i - %s\n", i, testModel->at(i)->settings.get("basicSettings.modelName").toString().toAscii().data());
+    modelCombo->addItem(testModel->at(i)->settings.get("basicSettings.modelName").toString());
   }
   if (modelIndex!=-1 && modelIndex<testModel->count()) modelCombo->setCurrentIndex(modelIndex);
 }

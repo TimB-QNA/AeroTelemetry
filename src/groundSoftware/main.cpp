@@ -2,6 +2,7 @@
 // QT4 - Experimental stage!!
 
 #include <QApplication>
+#include "pluginInterfaces.h"
 #include "mainWindow.h"
 #include "projection.h"
 void header();
@@ -29,8 +30,6 @@ int main(int argc, char * argv[]){
     if (netPlugin){
       printf("%s\t-\t%s\n", netPlugin->pluginName().toAscii().data(), netPlugin->pluginDescription().toAscii().data());
       network.append(netPlugin);
-    }else{
-      printf("Failed to load plugin - %s\n",loader.errorString().toAscii().data());
     }
   }
   

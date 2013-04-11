@@ -22,7 +22,7 @@ void selectModelDialog::showEvent(QShowEvent *event){
   int i;
   mIndex=-1;
   for (i=0;i<models.size();i++){
-    modelBox->addItem(models[i]->name,i);
+    modelBox->addItem(models[i]->settings.get("basicSettings.modelName").toString(),i);
   }
 }
 

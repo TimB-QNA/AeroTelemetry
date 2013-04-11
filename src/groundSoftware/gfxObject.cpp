@@ -9,8 +9,25 @@ gfxObject::gfxObject(vtkRenderer *ren){
   renderer=ren;
 }
 
-
 bool gfxObject::loadCAD(QString filename){
+  int i;
+  cadFormatInterface *cadPlugin;
+  printf("Searching cad format plugins:\n");
+  // Load plugins...
+  QDir pluginDir("plugins");
+  QStringList pluginFiles;
+  pluginDir.setNameFilters(QStringList(QString("*.so")));
+  pluginFiles=pluginDir.entryList();
+  for (i=0;i<pluginFiles.count();i++){
+    printf("Trying to load - %s\n",pluginFiles[i].toAscii().data());
+    QPluginLoader loader(pluginDir.path()+"/"+pluginFiles[i]);
+    cadPlugin = qobject_cast<cadFormatInterface *> (loader.instance());
+    if (cadPlugin){
+      printf("%s\t-\t%s\n", cadPlugin->pluginName().toAscii().data(), cadPlugin->pluginDescription().toAscii().data());
+      cadPlugin->setParentObject(this);
+      if (cadPlugin->loadCAD(filename)) return true;
+    }
+  }
   return false;
 }
 

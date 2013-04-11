@@ -17,7 +17,6 @@
 #include <vtkRenderer.h>
 #include <vtkRenderWindow.h>
 #include <vector>
-#include "openNURBS-5/opennurbs.h"
 
 #include "gfxObject.h"
 #include "viewSettings.h"
@@ -31,11 +30,13 @@ class gfxDisplay : public QVTKWidget
     QList<gfxObject*> model;
     
     gfxDisplay(QVTKWidget *parent=0);
-    void runRenderer();
+    void clear();
     void loadScenery(QString filename);
     int  loadModel(QString filename);
     void setCamera(viewSettings viewInfo);
 
+    void setBackground(QColor bckColour);
+    
   private slots:
 //    void paintEvent(QPaintEvent* event);
 

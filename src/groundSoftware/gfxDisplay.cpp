@@ -3,17 +3,17 @@
 
 #include "gfxDisplay.h"
 
-#include "gfxRhino3D.h"
 #include "gfxOSM.h"
 
 gfxDisplay::gfxDisplay(QVTKWidget *parent) : QVTKWidget(parent){
   int i;
+  
   setAutoFillBackground(false);
   setBaseSize(640,480);
   
   // Setup renderer
   renderer = vtkRenderer::New();
-  renderer->SetBackground(0.0,0.0,0.0);
+  setBackground(QColor(0,0,0));
   renderer->ResetCamera();
   
   GetRenderWindow()->AddRenderer(renderer);
@@ -25,43 +25,32 @@ gfxDisplay::gfxDisplay(QVTKWidget *parent) : QVTKWidget(parent){
   defaultCamera->SetViewUp(0,0,1);
   renderer->SetActiveCamera(defaultCamera);
 
-  runRenderer();
+  GetInteractor()->StartListening();
 }
 
-void gfxDisplay::runRenderer(){
-  printf("Requesting Render\n");
-//  GetInteractor()->CreateTimer(0);
-//  GetRenderWindow()->Render();
+void gfxDisplay::setBackground(QColor bckColour){
+  renderer->SetBackground((float)bckColour.red()/255.,(float)bckColour.green()/255.,(float)bckColour.blue()/255.);
 }
 
 void gfxDisplay::loadScenery(QString filename){
-  gfxRhino3D *tempR3D; tempR3D = new gfxRhino3D(renderer);
-  gfxOSM     *tempOSM; tempOSM = new gfxOSM(renderer);
-  
-  if (tempR3D->loadCAD(filename)){
-    Scenery = tempR3D;
-    return;
+  gfxObject *tmpObj;
+  tmpObj = new gfxObject(renderer);
+  if (tmpObj->loadCAD(filename)){
+    Scenery=tmpObj;
   }else{
-    delete tempR3D;
-  }
-
-  if (tempOSM->loadCAD(filename)){
-    Scenery = tempOSM;
-    return;
-  }else{
-    delete tempOSM;
+    delete tmpObj;
   }
 }
 
+
 int gfxDisplay::loadModel(QString filename){
-  gfxRhino3D *tempR3D; tempR3D = new gfxRhino3D(renderer);
-
-  if (tempR3D->loadCAD(filename)){
-    model.append(tempR3D);
+  gfxObject *tmpObj;
+  tmpObj = new gfxObject(renderer);
+  if (tmpObj->loadCAD(filename)){
+    model.append(tmpObj);
   }else{
-    delete tempR3D;
+    delete tmpObj;
   }
-
   return model.size()-1;
 }
 
@@ -86,3 +75,14 @@ void gfxDisplay::paintEvent(QPaintEvent* event){
   painter.drawPixmap(0, 0, cachedImage);
 }
 */
+
+void gfxDisplay::clear(){
+  int i;
+  /*
+  delete Scenery;
+  for (i=0;i<model.count();i++){
+    delete model[i];
+  }
+  model.clear();
+  */
+}

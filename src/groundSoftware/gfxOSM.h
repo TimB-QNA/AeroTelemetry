@@ -23,7 +23,6 @@
 #include <vtkPolyLine.h>
 
 #include <vector>
-#include "openNURBS-5/opennurbs.h"
 using namespace std;
 
 class gfxOSM : public gfxObject
